@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ER Debrief</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+:root {
+  --bg:#f4f6f9;--white:#fff;--border:#e0e5ed;--border-light:#eef0f4;
+  --primary:#1a6fd4;--primary-light:#e8f0fb;--primary-dark:#1457a8;
+  --accent:#e8420a;--text:#1a1f2e;--text-mid:#4a5568;--text-muted:#8896ae;
+  --tag-bg:#eef3fb;--tag-color:#2563b0;--green:#0a9e6e;--green-bg:#e6f7f2;
+  --orange:#c47000;--orange-bg:#fef3e2;--red:#c0392b;--red-bg:#fdecea;
+  --gold:#c8960a;--gold-bg:#fff9e6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;line-height:1.6;}
+
+.site-header{background:var(--primary);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.header-inner{max-width:1060px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px;height:54px;}
+.site-logo{font-size:18px;font-weight:700;color:#fff;white-space:nowrap;}
+.site-logo span{color:#7ec8ff;}
+.header-search{flex:1;display:flex;background:#fff;border-radius:6px;overflow:hidden;}
+.header-search input{flex:1;border:none;outline:none;padding:8px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;color:var(--text);}
+.header-search button{background:var(--accent);border:none;padding:0 14px;cursor:pointer;color:#fff;font-size:15px;}
+.post-btn{background:#fff;color:var(--primary);border:none;border-radius:6px;padding:7px 14px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.post-btn:hover{background:#e8f0fb;}
+
+.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 0;}
+.filter-inner{max-width:1060px;margin:0 auto;padding:0 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.filter-label{font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
+.filter-chip{font-size:12px;padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text-mid);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;}
+.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.filter-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+
+.layout{max-width:1060px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start;}
+.sidebar{position:sticky;top:102px;}
+.sidebar-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
+.sidebar-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-light);font-size:13px;}
+.stat-row:last-child{border-bottom:none;}
+.stat-num{font-weight:700;color:var(--primary);font-size:16px;}
+.cat-filter{display:flex;flex-direction:column;gap:2px;}
+.cat-btn{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text-mid);border:none;background:transparent;width:100%;text-align:left;font-family:'Noto Sans JP',sans-serif;transition:background .15s;}
+.cat-btn:hover{background:var(--bg);}
+.cat-btn.active{background:var(--primary-light);color:var(--primary);font-weight:700;}
+.cat-count{font-size:11px;background:var(--border);color:var(--text-muted);border-radius:10px;padding:1px 7px;}
+.cat-btn.active .cat-count{background:var(--primary);color:#fff;}
+.rank-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light);}
+.rank-item:last-child{border-bottom:none;}
+.rank-num{font-size:13px;font-weight:700;color:var(--text-muted);width:20px;text-align:center;flex-shrink:0;}
+.rank-num.gold{color:var(--gold);}
+.rank-num.silver{color:#888;}
+.rank-num.bronze{color:#b87333;}
+.rank-body{flex:1;min-width:0;}
+.rank-title{font-size:12px;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rank-meta{font-size:11px;color:var(--text-muted);}
+
+.result-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.result-count{font-size:13px;color:var(--text-muted);}
+.result-count strong{color:var(--text);}
+.sort-btns{display:flex;gap:4px;}
+.sort-btn{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--text-mid);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
+.sort-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.q-item{background:var(--white);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:box-shadow .15s,border-color .15s;animation:fadeIn .25s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.q-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);border-color:#c5d4e8;}
+.q-summary{padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;}
+.q-icon{flex-shrink:0;width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.q-body{flex:1;min-width:0;}
+.q-title{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px;line-height:1.4;}
+.q-excerpt{font-size:13px;color:var(--text-mid);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;}
+.q-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.tag{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;}
+.tag-cat{background:var(--tag-bg);color:var(--tag-color);}
+.tag-route{background:var(--orange-bg);color:var(--orange);}
+.tag-patient{background:var(--border-light);color:var(--text-muted);}
+.tag-resolved{background:var(--green-bg);color:var(--green);}
+.q-meta{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--text-muted);}
+
+.q-detail{display:none;border-top:1px solid var(--border-light);}
+.q-detail.open{display:block;}
+.detail-body{padding:16px 16px 0;}
+.d-section{margin-bottom:16px;}
+.d-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);margin-bottom:5px;}
+.d-text{font-size:13px;color:var(--text-mid);line-height:1.75;background:var(--bg);border-radius:6px;padding:10px 12px;}
+.d-question{font-size:14px;font-weight:500;color:var(--primary-dark);background:var(--primary-light);border-left:3px solid var(--primary);border-radius:0 6px 6px 0;padding:10px 14px;line-height:1.6;}
+.vitals-row{display:flex;flex-wrap:wrap;gap:8px;}
+.vital-chip{background:#fff;border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:500;}
+
+.related-section{margin:0 16px 16px;padding:14px;background:var(--bg);border-radius:8px;}
+.related-title{font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;}
+.related-item{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;border-bottom:1px solid var(--border-light);}
+.related-item:last-child{border-bottom:none;}
+.related-icon{font-size:14px;}
+.related-text{font-size:12px;color:var(--primary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.related-ans{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+
+.answers-section{padding:0 16px 16px;}
+.answers-header{display:flex;align-items:center;gap:8px;padding:14px 0 12px;border-top:1px solid var(--border-light);font-size:13px;font-weight:700;}
+.answer-count-badge{background:var(--primary);color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;}
+.resolve-btn{margin-left:auto;font-size:11px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:4px;padding:2px 8px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
+.resolve-btn:hover{background:var(--green-bg);}
+.resolve-btn.resolved{background:var(--green-bg);font-weight:700;}
+.answer-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border-light);}
+.answer-item:last-child{border-bottom:none;}
+.ans-avatar{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ans-body{flex:1;}
+.ans-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
+.ans-name{font-size:12px;font-weight:700;color:var(--primary);}
+.ans-role{font-size:11px;color:var(--text-muted);background:var(--border-light);padding:1px 6px;border-radius:3px;}
+.ans-time{font-size:11px;color:var(--text-muted);margin-left:auto;}
+.ans-text{font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:6px;}
+.ans-actions{display:flex;align-items:center;gap:10px;}
+.helpful-btn{display:flex;align-items:center;gap:4px;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:3px 10px;background:transparent;cursor:pointer;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
+.helpful-btn:hover{border-color:var(--primary);color:var(--primary);}
+.helpful-btn.voted{background:var(--primary-light);border-color:var(--primary);color:var(--primary);font-weight:700;}
+.best-badge{font-size:11px;background:var(--gold-bg);color:var(--gold);border:1px solid #ffe066;border-radius:4px;padding:2px 8px;font-weight:700;}
+.report-btn{font-size:11px;color:var(--text-muted);background:transparent;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;padding:3px 6px;border-radius:4px;}
+.report-btn:hover{background:var(--red-bg);color:var(--red);}
+
+.replies{margin-top:8px;padding-left:16px;border-left:2px solid var(--border-light);}
+.reply-item{padding:6px 0;border-bottom:1px solid var(--border-light);}
+.reply-item:last-child{border-bottom:none;}
+.reply-meta{display:flex;gap:6px;align-items:center;margin-bottom:3px;}
+.reply-name{font-size:11px;font-weight:700;color:var(--primary);}
+.reply-role{font-size:10px;color:var(--text-muted);background:var(--border-light);padding:1px 5px;border-radius:3px;}
+.reply-time{font-size:10px;color:var(--text-muted);margin-left:auto;}
+.reply-text{font-size:12px;color:var(--text-mid);line-height:1.6;}
+.reply-input-wrap{display:none;margin-top:8px;gap:6px;flex-direction:column;}
+.reply-input-wrap.open{display:flex;}
+.reply-input-wrap input,.reply-input-wrap textarea{border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);outline:none;width:100%;}
+.reply-input-wrap input:focus,.reply-input-wrap textarea:focus{border-color:var(--primary);}
+.reply-input-wrap textarea{resize:vertical;min-height:60px;line-height:1.5;}
+.reply-send-row{display:flex;gap:6px;}
+.reply-submit{background:var(--primary);color:#fff;border:none;border-radius:5px;padding:6px 14px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+
+.ans-input-wrap{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.ans-input-wrap textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border-color .15s;line-height:1.6;}
+.ans-input-wrap textarea:focus{border-color:var(--primary);}
+.ans-input-wrap textarea::placeholder{color:var(--text-muted);}
+.ans-send-row{display:flex;gap:8px;}
+.ans-role-input{flex:1;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--text);outline:none;}
+.ans-role-input:focus{border-color:var(--primary);}
+.ans-role-input::placeholder{color:var(--text-muted);}
+.ans-submit{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.ans-submit:hover{background:var(--primary-dark);}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;animation:popIn .2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1;}
+.modal-head h2{font-size:16px;font-weight:700;}
+.modal-close{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-muted);}
+.modal-body{padding:20px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-mid);margin-bottom:6px;}
+.form-label .req{color:var(--accent);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+select,.f-input{width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--text);outline:none;background:#fff;transition:border-color .15s;appearance:none;}
+select:focus,.f-input:focus{border-color:var(--primary);}
+.f-textarea{width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .15s;}
+.f-textarea:focus{border-color:var(--primary);}
+::placeholder{color:var(--text-muted);}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;}
+.chip-label{position:relative;cursor:pointer;}
+.chip-label input{position:absolute;opacity:0;width:0;height:0;}
+.chip-label span{display:block;padding:5px 12px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--text-mid);background:var(--bg);transition:all .15s;}
+.chip-label input:checked+span{border-color:var(--primary);background:var(--primary-light);color:var(--primary);font-weight:700;}
+.notice{background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:10px 12px;font-size:12px;color:#7c5800;line-height:1.6;margin-bottom:18px;}
+.notice strong{color:var(--accent);}
+.modal-footer{padding:12px 20px 20px;}
+.submit-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:13px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.submit-btn:hover{background:var(--primary-dark);}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;}
+
+.report-modal{background:#fff;border-radius:12px;width:100%;max-width:400px;padding:24px;animation:popIn .2s ease;}
+.report-modal h3{font-size:15px;font-weight:700;margin-bottom:12px;}
+.report-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.report-radio{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+.report-submit{width:100%;background:var(--red);color:#fff;border:none;border-radius:7px;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.report-cancel{width:100%;background:transparent;border:1px solid var(--border);border-radius:7px;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--text-muted);cursor:pointer;margin-top:6px;}
+
+.no-result{background:#fff;border:1px solid var(--border);border-radius:10px;padding:48px 20px;text-align:center;color:var(--text-muted);}
+.no-result .icon{font-size:40px;margin-bottom:12px;}
+mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1f2e;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static;}
+  .form-row{grid-template-columns:1fr;}
+  .filter-bar{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="site-logo">ER<span>Debrief</span></div>
+    <div class="header-search">
+      <input type="text" id="searchInput" placeholder="主訴・キーワードで検索…" oninput="doSearch()">
+      <button onclick="doSearch()">🔍</button>
+    </div>
+    <button class="post-btn" onclick="openModal()">＋ 投稿</button>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <div class="filter-inner">
+    <span class="filter-label">来院経緯：</span>
+    <button class="filter-chip active" onclick="setRoute(this,'')">すべて</button>
+    <button class="filter-chip" onclick="setRoute(this,'救急搬送')">救急搬送</button>
+    <button class="filter-chip" onclick="setRoute(this,'独歩')">独歩</button>
+    <button class="filter-chip" onclick="setRoute(this,'ドクターカー')">ドクターカー</button>
+    <button class="filter-chip" onclick="setRoute(this,'ドクターヘリ')">ドクターヘリ</button>
+    <button class="filter-chip" onclick="setRoute(this,'院内急変')">院内急変</button>
+    <div class="filter-divider"></div>
+    <span class="filter-label">状態：</span>
+    <button class="filter-chip" id="filterResolved" onclick="toggleResolved(this)">解決済みのみ</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">統計</div>
+      <div class="stat-row"><span>投稿数</span><span class="stat-num" id="statTotal">-</span></div>
+      <div class="stat-row"><span>コメント数</span><span class="stat-num" id="statComments">-</span></div>
+      <div class="stat-row"><span>今日の投稿</span><span class="stat-num" id="statToday">-</span></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">カテゴリ</div>
+      <div class="cat-filter" id="catFilter"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">🏆 回答ランキング</div>
+      <div id="rankingList"><div style="font-size:12px;color:var(--text-muted)">読み込み中…</div></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="result-bar">
+      <div class="result-count" id="resultCount"></div>
+      <div class="sort-btns">
+        <button class="sort-btn active" onclick="setSort('new',this)">新着順</button>
+        <button class="sort-btn" onclick="setSort('comments',this)">回答が多い</button>
+        <button class="sort-btn" onclick="setSort('helpful',this)">参考になった</button>
+      </div>
+    </div>
+    <div id="caseList"><div class="loading"><div class="spinner"></div>読み込み中…</div></div>
+  </main>
+</div>
+
+<!-- 投稿モーダル -->
+<div class="overlay" id="overlay" onclick="handleOverlay(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>症例を投稿する</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="notice"><strong>⚠️ 個人情報の記載は絶対に禁止です。</strong><br>患者の氏名・生年月日・具体的な日時・病院名・地域名など、個人が特定できる情報は入力しないでください。</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">年齢層 <span class="req">*</span></label>
+          <select id="f_age"><option value="">選択</option><option>10代</option><option>20代</option><option>30代</option><option>40代</option><option>50代</option><option>60代</option><option>70代</option><option>80代以上</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">性別 <span class="req">*</span></label>
+          <select id="f_gender"><option value="">選択</option><option>男性</option><option>女性</option><option>不明</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">来院経緯 <span class="req">*</span></label>
+        <select id="f_route"><option value="">選択</option><option>救急搬送</option><option>独歩</option><option>ドクターカー</option><option>ドクターヘリ</option><option>院内急変</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">主訴 <span class="req">*</span></label>
+        <input type="text" class="f-input" id="f_complaint" placeholder="例：胸痛、意識障害、呼吸困難">
+      </div>
+      <div class="form-group">
+        <label class="form-label">カテゴリ <span class="req">*</span></label>
+        <div class="chip-group">
+          <label class="chip-label"><input type="checkbox" value="循環器"><span>循環器</span></label>
+          <label class="chip-label"><input type="checkbox" value="神経"><span>神経</span></label>
+          <label class="chip-label"><input type="checkbox" value="外傷"><span>外傷</span></label>
+          <label class="chip-label"><input type="checkbox" value="呼吸器"><span>呼吸器</span></label>
+          <label class="chip-label"><input type="checkbox" value="消化器"><span>消化器</span></label>
+          <label class="chip-label"><input type="checkbox" value="小児"><span>小児</span></label>
+          <label class="chip-label"><input type="checkbox" value="中毒"><span>中毒</span></label>
+          <label class="chip-label"><input type="checkbox" value="その他"><span>その他</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">バイタル概要</label>
+        <input type="text" class="f-input" id="f_vitals" placeholder="例：BP 80/50, HR 120, SpO2 88%, GCS 10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">自分のアセスメント・対応 <span class="req">*</span></label>
+        <textarea class="f-textarea" id="f_assess" placeholder="どう判断して何をしたか。気になったこと、考えたことを記述してください。"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">最終診断・転帰（任意）</label>
+        <input type="text" class="f-input" id="f_outcome" placeholder="例：ACS疑いでPCI、ICU転送">
+      </div>
+      <div class="form-group">
+        <label class="form-label">みんなに聞きたいこと <span class="req">*</span></label>
+        <textarea class="f-textarea" id="f_question" placeholder="この症例で迷ったこと、改善できたこと、アドバイスをもらいたいことを書いてください。"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="submit-btn" id="submitBtn" onclick="submitCase()">投稿する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通報モーダル -->
+<div class="overlay" id="reportOverlay" onclick="if(event.target===this)closeReport()">
+  <div class="report-modal">
+    <h3>⚠️ この投稿を通報する</h3>
+    <div class="report-options">
+      <label class="report-radio"><input type="radio" name="reportReason" value="個人情報が含まれている"> 個人情報が含まれている</label>
+      <label class="report-radio"><input type="radio" name="reportReason" value="不適切な内容"> 不適切な内容</label>
+      <label class="report-radio"><input type="radio" name="reportReason" value="医療的に誤った情報"> 医療的に誤った情報</label>
+      <label class="report-radio"><input type="radio" name="reportReason" value="スパム・宣伝"> スパム・宣伝</label>
+      <label class="report-radio"><input type="radio" name="reportReason" value="その他"> その他</label>
+    </div>
+    <button class="report-submit" onclick="submitReport()">通報する</button>
+    <button class="report-cancel" onclick="closeReport()">キャンセル</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==============================
+// ⚙️ Supabase設定 ここだけ書き換えて！
+// ==============================
+const SUPABASE_URL = 'https://vncekznakpnrvmqnexgu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fbABzcgMWbbF4H6y_SYWwA_kvJifRQ2';
+// ==============================
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const CATS=['すべて','循環器','神経','外傷','呼吸器','消化器','小児','中毒','その他'];
+const ICONS={循環器:'🫀',神経:'🧠',外傷:'🩹',呼吸器:'🫁',消化器:'🏥',小児:'👶',中毒:'⚗️',その他:'📋'};
+const COLORS={循環器:'#fdecea',神経:'#e8f0fb',外傷:'#fef3e2',呼吸器:'#e6f7f2',消化器:'#fff3e0',小児:'#f3e8ff',中毒:'#e8f5e9',その他:'#f4f6f9'};
+const AVATARS=['🧑‍⚕️','👩‍⚕️','👨‍⚕️'];
+
+let allCases=[], allAnswers=[], allReplies=[];
+let currentCat='すべて', currentSort='new', searchQuery='', currentRoute='', showResolved=false;
+let votedAnswers=new Set(JSON.parse(localStorage.getItem('votedAnswers')||'[]'));
+let reportTargetId=null;
+
+// ── トースト ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── 時間フォーマット ──
+function fmtTime(ts){
+  const m=Math.floor((Date.now()-new Date(ts))/60000);
+  if(m<1)return'たった今'; if(m<60)return m+'分前';
+  const h=Math.floor(m/60); if(h<24)return h+'時間前';
+  return Math.floor(h/24)+'日前';
+}
+
+// ── ハイライト ──
+const hl=(t,q)=>q?t.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark>${m}</mark>`):t;
+
+// ── データ取得 ──
+async function loadAll(){
+  const [casesRes, answersRes, repliesRes] = await Promise.all([
+    db.from('cases').select('*').order('created_at',{ascending:false}),
+    db.from('answers').select('*').order('created_at',{ascending:true}),
+    db.from('replies').select('*').order('created_at',{ascending:true})
+  ]);
+  allCases = casesRes.data || [];
+  allAnswers = answersRes.data || [];
+  allReplies = repliesRes.data || [];
+  render();
+}
+
+// ── フィルタ ──
+function getFiltered(){
+  let list=[...allCases];
+  if(currentCat!=='すべて') list=list.filter(c=>c.categories.includes(currentCat));
+  if(currentRoute) list=list.filter(c=>c.route===currentRoute);
+  if(showResolved) list=list.filter(c=>c.resolved);
+  if(searchQuery){
+    const q=searchQuery.toLowerCase();
+    list=list.filter(c=>[c.complaint,c.assessment,c.question,c.outcome||'',...c.categories].some(s=>s.toLowerCase().includes(q)));
+  }
+  const answerCount=id=>allAnswers.filter(a=>a.case_id===id).length;
+  const helpfulCount=id=>allAnswers.filter(a=>a.case_id===id).reduce((s,a)=>s+a.helpful,0);
+  if(currentSort==='new') list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  else if(currentSort==='comments') list.sort((a,b)=>answerCount(b.id)-answerCount(a.id));
+  else if(currentSort==='helpful') list.sort((a,b)=>helpfulCount(b.id)-helpfulCount(a.id));
+  return list;
+}
+
+// ── レンダリング ──
+function render(){
+  const today=new Date().toDateString();
+  document.getElementById('statTotal').textContent=allCases.length;
+  document.getElementById('statComments').textContent=allAnswers.length;
+  document.getElementById('statToday').textContent=allCases.filter(c=>new Date(c.created_at).toDateString()===today).length;
+
+  // カテゴリフィルター
+  document.getElementById('catFilter').innerHTML=CATS.map(cat=>{
+    const n=cat==='すべて'?allCases.length:allCases.filter(c=>c.categories.includes(cat)).length;
+    return`<button class="cat-btn${cat===currentCat?' active':''}" onclick="setCat('${cat}')">${cat==='すべて'?'📋':ICONS[cat]||'🏥'} ${cat}<span class="cat-count">${n}</span></button>`;
+  }).join('');
+
+  // ランキング
+  const answerMap={};
+  allAnswers.forEach(a=>{
+    if(!answerMap[a.name])answerMap[a.name]={name:a.name,role:a.role||'',helpful:0,count:0};
+    answerMap[a.name].helpful+=a.helpful;
+    answerMap[a.name].count++;
+  });
+  const ranked=Object.values(answerMap).sort((a,b)=>b.helpful-a.helpful).slice(0,5);
+  const medals=['gold','silver','bronze'];
+  document.getElementById('rankingList').innerHTML=ranked.length
+    ?ranked.map((r,i)=>`<div class="rank-item"><div class="rank-num${medals[i]?' '+medals[i]:''}">${i+1}</div><div class="rank-body"><div class="rank-title">${r.name}</div><div class="rank-meta">${r.role} · 👍 ${r.helpful}</div></div></div>`).join('')
+    :'<div style="font-size:12px;color:var(--text-muted)">まだデータがありません</div>';
+
+  const filtered=getFiltered();
+  const q=searchQuery;
+  document.getElementById('resultCount').innerHTML=`<strong>${filtered.length}件</strong>の症例${q?`（"${q}"）`:''}`;
+
+  if(!filtered.length){
+    document.getElementById('caseList').innerHTML=`<div class="no-result"><div class="icon">🔍</div><div>該当する症例が見つかりませんでした。</div></div>`;
+    return;
+  }
+
+  document.getElementById('caseList').innerHTML=filtered.map(c=>{
+    const icon=ICONS[c.categories[0]]||'🏥';
+    const bg=COLORS[c.categories[0]]||'#f4f6f9';
+    const catTags=c.categories.map(cat=>`<span class="tag tag-cat">${cat}</span>`).join('');
+    const caseAnswers=allAnswers.filter(a=>a.case_id===c.id);
+    const totalHelpful=caseAnswers.reduce((s,a)=>s+a.helpful,0);
+
+    // 関連症例
+    const related=allCases.filter(x=>x.id!==c.id&&x.categories.some(cat=>c.categories.includes(cat))).slice(0,3);
+    const relatedHtml=related.length?`<div class="related-section"><div class="related-title">🔗 関連症例</div>${related.map(r=>`<div class="related-item" onclick="scrollToCase('${r.id}')"><span class="related-icon">${ICONS[r.categories[0]]||'📋'}</span><span class="related-text">${r.complaint}</span><span class="related-ans">💬${allAnswers.filter(a=>a.case_id===r.id).length}</span></div>`).join('')}</div>`:'';
+
+    // ベスト回答
+    const bestAnswer=caseAnswers.length?caseAnswers.reduce((best,x)=>x.helpful>best.helpful?x:best,caseAnswers[0]):null;
+
+    const answersHtml=caseAnswers.map(a=>{
+      const aReplies=allReplies.filter(r=>r.answer_id===a.id);
+      const repliesHtml=aReplies.map(rep=>`<div class="reply-item"><div class="reply-meta"><span class="reply-name">${rep.name}</span><span class="reply-role">${rep.role||''}</span><span class="reply-time">${fmtTime(rep.created_at)}</span></div><div class="reply-text">${rep.text}</div></div>`).join('');
+      const isBest=bestAnswer&&a.id===bestAnswer.id&&caseAnswers.length>1;
+      const voted=votedAnswers.has(a.id);
+      return`<div class="answer-item">
+        <div class="ans-avatar">${AVATARS[Math.floor(Math.random()*3)]}</div>
+        <div class="ans-body">
+          <div class="ans-meta">
+            <span class="ans-name">${a.name}</span>
+            <span class="ans-role">${a.role||'匿名'}</span>
+            ${isBest?'<span class="best-badge">👑 ベスト回答</span>':''}
+            <span class="ans-time">${fmtTime(a.created_at)}</span>
+          </div>
+          <div class="ans-text">${a.text}</div>
+          <div class="ans-actions">
+            <button class="helpful-btn${voted?' voted':''}" onclick="voteHelpful('${a.id}','${c.id}')">👍 参考になった ${a.helpful}</button>
+            <button class="reply-toggle report-btn" onclick="toggleReplyInput('${c.id}','${a.id}')">💬 返信</button>
+            <button class="report-btn" onclick="openReport('${c.id}')">通報</button>
+          </div>
+          ${repliesHtml?`<div class="replies">${repliesHtml}</div>`:''}
+          <div class="reply-input-wrap" id="replyWrap-${c.id}-${a.id}">
+            <input type="text" id="replyRole-${c.id}-${a.id}" placeholder="立場・経験年数">
+            <textarea id="replyText-${c.id}-${a.id}" placeholder="返信を入力…"></textarea>
+            <div class="reply-send-row"><button class="reply-submit" onclick="sendReply('${c.id}','${a.id}')">返信する</button></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return`<div class="q-item" id="qitem-${c.id}">
+      <div class="q-summary" onclick="toggleDetail('${c.id}')">
+        <div class="q-icon" style="background:${bg}">${icon}</div>
+        <div class="q-body">
+          <div class="q-title">${hl(c.complaint,q)}</div>
+          <div class="q-excerpt">${hl(c.question,q)}</div>
+          <div class="q-tags">${catTags}<span class="tag tag-route">${c.route}</span><span class="tag tag-patient">${c.age}・${c.gender}</span>${c.resolved?'<span class="tag tag-resolved">✓ 解決済み</span>':''}</div>
+          <div class="q-meta"><span>💬 ${caseAnswers.length}件の回答</span><span>👍 ${totalHelpful}</span><span>🕐 ${fmtTime(c.created_at)}</span></div>
+        </div>
+      </div>
+      <div class="q-detail" id="detail-${c.id}">
+        <div class="detail-body">
+          ${c.vitals?`<div class="d-section"><div class="d-label">バイタル</div><div class="vitals-row">${c.vitals.split(/[　,、]/).filter(Boolean).map(v=>`<span class="vital-chip">${v.trim()}</span>`).join('')}</div></div>`:''}
+          <div class="d-section"><div class="d-label">アセスメント・対応</div><div class="d-text">${hl(c.assessment,q)}</div></div>
+          ${c.outcome?`<div class="d-section"><div class="d-label">最終診断・転帰</div><div class="d-text">${c.outcome}</div></div>`:''}
+          <div class="d-section"><div class="d-label">みんなに聞きたいこと</div><div class="d-question">${hl(c.question,q)}</div></div>
+        </div>
+        ${relatedHtml}
+        <div class="answers-section">
+          <div class="answers-header">回答 <span class="answer-count-badge">${caseAnswers.length}</span>
+            <button class="resolve-btn${c.resolved?' resolved':''}" onclick="toggleResolve('${c.id}',${c.resolved})">${c.resolved?'✓ 解決済み':'解決済みにする'}</button>
+          </div>
+          <div id="answers-${c.id}">${answersHtml}</div>
+          <div class="ans-input-wrap">
+            <textarea id="ansText-${c.id}" placeholder="アドバイス・コメントを入力…"></textarea>
+            <div class="ans-send-row">
+              <input type="text" class="ans-role-input" id="ansRole-${c.id}" placeholder="立場・経験年数（例：救急 5年目）">
+              <button class="ans-submit" onclick="sendAnswer('${c.id}')">回答する</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetail(id){document.getElementById(`detail-${id}`).classList.toggle('open');}
+function scrollToCase(id){const el=document.getElementById(`qitem-${id}`);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>document.getElementById(`detail-${id}`).classList.add('open'),400);}}
+function setCat(cat){currentCat=cat;render();}
+function setSort(s,btn){currentSort=s;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function doSearch(){searchQuery=document.getElementById('searchInput').value.trim();render();}
+function setRoute(btn,route){currentRoute=route;document.querySelectorAll('.filter-chip').forEach(b=>{if(b.onclick&&b.onclick.toString().includes('setRoute'))b.classList.remove('active')});btn.classList.add('active');render();}
+function toggleResolved(btn){showResolved=!showResolved;btn.classList.toggle('active',showResolved);render();}
+function toggleReplyInput(caseId,ansId){document.getElementById(`replyWrap-${caseId}-${ansId}`).classList.toggle('open');}
+
+async function toggleResolve(id,current){
+  await db.from('cases').update({resolved:!current}).eq('id',id);
+  await loadAll();
+  document.getElementById(`detail-${id}`).classList.add('open');
+}
+
+async function voteHelpful(answerId,caseId){
+  if(votedAnswers.has(answerId)){showToast('すでに投票済みです');return;}
+  const ans=allAnswers.find(a=>a.id===answerId);
+  if(!ans)return;
+  await db.from('answers').update({helpful:ans.helpful+1}).eq('id',answerId);
+  votedAnswers.add(answerId);
+  localStorage.setItem('votedAnswers',JSON.stringify([...votedAnswers]));
+  await loadAll();
+  document.getElementById(`detail-${caseId}`).classList.add('open');
+  showToast('👍 参考になったを送りました');
+}
+
+async function sendAnswer(caseId){
+  const textEl=document.getElementById(`ansText-${caseId}`);
+  const roleEl=document.getElementById(`ansRole-${caseId}`);
+  const text=textEl.value.trim();
+  if(!text){showToast('コメントを入力してください');return;}
+  await db.from('answers').insert({case_id:caseId,name:'Nurse_'+Math.random().toString(36).slice(2,5).toUpperCase(),role:roleEl.value.trim()||'匿名',text,helpful:0});
+  textEl.value='';roleEl.value='';
+  await loadAll();
+  document.getElementById(`detail-${caseId}`).classList.add('open');
+  showToast('✅ 回答を投稿しました');
+}
+
+async function sendReply(caseId,answerId){
+  const textEl=document.getElementById(`replyText-${caseId}-${answerId}`);
+  const roleEl=document.getElementById(`replyRole-${caseId}-${answerId}`);
+  const text=textEl.value.trim();
+  if(!text)return;
+  await db.from('replies').insert({answer_id:answerId,name:'Nurse_'+Math.random().toString(36).slice(2,5).toUpperCase(),role:roleEl.value.trim()||'匿名',text});
+  textEl.value='';roleEl.value='';
+  await loadAll();
+  document.getElementById(`detail-${caseId}`).classList.add('open');
+  showToast('✅ 返信しました');
+}
+
+function openModal(){document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
+function handleOverlay(e){if(e.target===document.getElementById('overlay'))closeModal();}
+function openReport(caseId){reportTargetId=caseId;document.getElementById('reportOverlay').classList.add('open');}
+function closeReport(){document.getElementById('reportOverlay').classList.remove('open');}
+function submitReport(){
+  const reason=document.querySelector('input[name="reportReason"]:checked');
+  if(!reason){showToast('理由を選択してください');return;}
+  showToast('通報を受け付けました');
+  closeReport();
+  document.querySelectorAll('input[name="reportReason"]').forEach(r=>r.checked=false);
+}
+
+async function submitCase(){
+  const v=id=>document.getElementById(id)?.value||'';
+  const age=v('f_age'),gender=v('f_gender'),route=v('f_route'),complaint=v('f_complaint').trim();
+  const cats=Array.from(document.querySelectorAll('.chip-group input:checked')).map(i=>i.value);
+  const vitals=v('f_vitals').trim(),assessment=v('f_assess').trim(),outcome=v('f_outcome').trim(),question=v('f_question').trim();
+  if(!age||!gender||!route||!complaint||!cats.length||!assessment||!question){showToast('必須項目（*）をすべて入力してください');return;}
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='投稿中…';
+
+  const {error}=await db.from('cases').insert({age,gender,route,complaint,categories:cats,vitals,assessment,outcome,question,resolved:false,helpful_count:0});
+
+  btn.disabled=false;btn.textContent='投稿する';
+
+  if(error){showToast('エラーが発生しました。もう一度試してください。');return;}
+
+  closeModal();
+  ['f_age','f_gender','f_route','f_complaint','f_vitals','f_assess','f_outcome','f_question'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.chip-group input').forEach(i=>i.checked=false);
+  await loadAll();
+  showToast('✅ 症例を投稿しました！');
+}
+
+// 初期読み込み
+loadAll();
+</script>
+</body>
+</html>
