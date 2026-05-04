@@ -28,12 +28,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 .post-btn{background:#fff;color:var(--primary);border:none;border-radius:6px;padding:7px 14px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .post-btn:hover{background:#e8f0fb;}
 
-.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 0;}
 .filter-inner{max-width:1060px;margin:0 auto;padding:0 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.filter-label{font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
-.filter-chip{font-size:12px;padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text-mid);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;}
-.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
-.filter-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
 
 .layout{max-width:1060px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start;}
 .sidebar{position:sticky;top:102px;}
@@ -58,6 +53,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 .rank-title{font-size:12px;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rank-meta{font-size:11px;color:var(--text-muted);}
 
+/* 知恵袋風タブ */
+.cb-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px;}
+.cb-tab{padding:10px 20px;border:none;background:transparent;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
+.cb-tab:hover{color:var(--primary);}
+.cb-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.cb-tab-badge{display:inline-block;background:var(--accent);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:5px;font-weight:700;}
+
 .result-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .result-count{font-size:13px;color:var(--text-muted);}
 .result-count strong{color:var(--text);}
@@ -65,7 +67,6 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 .sort-btn{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--text-mid);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s;}
 .sort-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
 
-/* Loading */
 .loading{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -81,9 +82,9 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 .q-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
 .tag{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;}
 .tag-cat{background:var(--tag-bg);color:var(--tag-color);}
-.tag-route{background:var(--orange-bg);color:var(--orange);}
 .tag-patient{background:var(--border-light);color:var(--text-muted);}
 .tag-resolved{background:var(--green-bg);color:var(--green);}
+.tag-募集中{background:#fff0f0;color:var(--accent);border:1px solid #ffd0c8;}
 .q-meta{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--text-muted);}
 
 .q-detail{display:none;border-top:1px solid var(--border-light);}
@@ -178,6 +179,33 @@ select:focus,.f-input:focus{border-color:var(--primary);}
 .chip-label input:checked+span{border-color:var(--primary);background:var(--primary-light);color:var(--primary);font-weight:700;}
 .notice{background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:10px 12px;font-size:12px;color:#7c5800;line-height:1.6;margin-bottom:18px;}
 .notice strong{color:var(--accent);}
+
+/* ステップフォーム */
+.step-progress{position:relative;height:4px;background:var(--border-light);}
+.step-progress-bar{position:absolute;left:0;top:0;height:100%;background:var(--primary);transition:width .3s ease;border-radius:0 4px 4px 0;}
+.step-indicator{position:absolute;right:16px;top:8px;font-size:11px;color:var(--text-muted);font-weight:700;background:#fff;padding:2px 8px;border-radius:10px;border:1px solid var(--border);}
+.step-panel{display:none;animation:fadeIn .3s ease;}
+.step-panel.active{display:block;}
+.step-header{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--border-light);}
+.step-icon{width:48px;height:48px;border-radius:12px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.step-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.step-sub{font-size:12px;color:var(--text-muted);}
+.optional{font-size:10px;color:var(--text-muted);background:var(--border-light);padding:1px 6px;border-radius:3px;margin-left:4px;font-weight:400;}
+.good-label{color:var(--green);}
+.bad-label{color:var(--accent);}
+
+.step-footer{display:flex;gap:8px;padding:12px 20px 20px;}
+.step-btn{padding:11px 18px;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text-mid);transition:all .15s;}
+.step-btn:hover{background:var(--bg);}
+.step-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);margin-left:auto;}
+.step-btn.primary:hover{background:var(--primary-dark);}
+.step-btn:disabled{opacity:.5;cursor:not-allowed;}
+.step-draft{color:var(--text-muted);font-size:12px;font-weight:400;}
+
+.summary-box{background:var(--primary-light);border:1px solid #c5d4e8;border-radius:10px;padding:14px;margin-top:16px;font-size:12px;line-height:1.7;color:var(--text-mid);}
+.summary-box .sb-title{font-size:11px;font-weight:700;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+.summary-box .sb-row{margin-bottom:4px;}
+.summary-box .sb-row b{color:var(--text);}
 .modal-footer{padding:12px 20px 20px;}
 .submit-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:13px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
 .submit-btn:hover{background:var(--primary-dark);}
@@ -194,7 +222,6 @@ select:focus,.f-input:focus{border-color:var(--primary);}
 .no-result .icon{font-size:40px;margin-bottom:12px;}
 mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
 
-/* Toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1f2e;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
 
@@ -202,7 +229,6 @@ mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
   .layout{grid-template-columns:1fr;}
   .sidebar{position:static;}
   .form-row{grid-template-columns:1fr;}
-  .filter-bar{display:none;}
 }
 </style>
 </head>
@@ -219,20 +245,7 @@ mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
   </div>
 </header>
 
-<div class="filter-bar">
-  <div class="filter-inner">
-    <span class="filter-label">来院経緯：</span>
-    <button class="filter-chip active" onclick="setRoute(this,'')">すべて</button>
-    <button class="filter-chip" onclick="setRoute(this,'救急搬送')">救急搬送</button>
-    <button class="filter-chip" onclick="setRoute(this,'独歩')">独歩</button>
-    <button class="filter-chip" onclick="setRoute(this,'ドクターカー')">ドクターカー</button>
-    <button class="filter-chip" onclick="setRoute(this,'ドクターヘリ')">ドクターヘリ</button>
-    <button class="filter-chip" onclick="setRoute(this,'院内急変')">院内急変</button>
-    <div class="filter-divider"></div>
-    <span class="filter-label">状態：</span>
-    <button class="filter-chip" id="filterResolved" onclick="toggleResolved(this)">解決済みのみ</button>
-  </div>
-</div>
+
 
 <div class="layout">
   <aside class="sidebar">
@@ -253,9 +266,15 @@ mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
   </aside>
 
   <main>
+    <!-- 知恵袋風タブ -->
+    <div class="cb-tabs">
+      <button class="cb-tab active" onclick="setCbTab('recruiting',this)">回答募集中<span class="cb-tab-badge" id="recruitingBadge">0</span></button>
+      <button class="cb-tab" onclick="setCbTab('resolved',this)">最新の解決済み<span class="cb-tab-badge" id="resolvedBadge" style="background:var(--green)">0</span></button>
+    </div>
+
     <div class="result-bar">
       <div class="result-count" id="resultCount"></div>
-      <div class="sort-btns">
+      <div class="sort-btns" id="sortBtns">
         <button class="sort-btn active" onclick="setSort('new',this)">新着順</button>
         <button class="sort-btn" onclick="setSort('comments',this)">回答が多い</button>
         <button class="sort-btn" onclick="setSort('helpful',this)">参考になった</button>
@@ -269,61 +288,193 @@ mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
 <div class="overlay" id="overlay" onclick="handleOverlay(event)">
   <div class="modal">
     <div class="modal-head">
-      <h2>症例を投稿する</h2>
+      <h2 id="modalTitle">症例を投稿する</h2>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
-    <div class="modal-body">
-      <div class="notice"><strong>⚠️ 個人情報の記載は絶対に禁止です。</strong><br>患者の氏名・生年月日・具体的な日時・病院名・地域名など、個人が特定できる情報は入力しないでください。</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">年齢層 <span class="req">*</span></label>
-          <select id="f_age"><option value="">選択</option><option>10代</option><option>20代</option><option>30代</option><option>40代</option><option>50代</option><option>60代</option><option>70代</option><option>80代以上</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">性別 <span class="req">*</span></label>
-          <select id="f_gender"><option value="">選択</option><option>男性</option><option>女性</option><option>不明</option></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">来院経緯 <span class="req">*</span></label>
-        <select id="f_route"><option value="">選択</option><option>救急搬送</option><option>独歩</option><option>ドクターカー</option><option>ドクターヘリ</option><option>院内急変</option></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">主訴 <span class="req">*</span></label>
-        <input type="text" class="f-input" id="f_complaint" placeholder="例：胸痛、意識障害、呼吸困難">
-      </div>
-      <div class="form-group">
-        <label class="form-label">カテゴリ <span class="req">*</span></label>
-        <div class="chip-group">
-          <label class="chip-label"><input type="checkbox" value="循環器"><span>循環器</span></label>
-          <label class="chip-label"><input type="checkbox" value="神経"><span>神経</span></label>
-          <label class="chip-label"><input type="checkbox" value="外傷"><span>外傷</span></label>
-          <label class="chip-label"><input type="checkbox" value="呼吸器"><span>呼吸器</span></label>
-          <label class="chip-label"><input type="checkbox" value="消化器"><span>消化器</span></label>
-          <label class="chip-label"><input type="checkbox" value="小児"><span>小児</span></label>
-          <label class="chip-label"><input type="checkbox" value="中毒"><span>中毒</span></label>
-          <label class="chip-label"><input type="checkbox" value="その他"><span>その他</span></label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">バイタル概要</label>
-        <input type="text" class="f-input" id="f_vitals" placeholder="例：BP 80/50, HR 120, SpO2 88%, GCS 10">
-      </div>
-      <div class="form-group">
-        <label class="form-label">自分のアセスメント・対応 <span class="req">*</span></label>
-        <textarea class="f-textarea" id="f_assess" placeholder="どう判断して何をしたか。気になったこと、考えたことを記述してください。"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">最終診断・転帰（任意）</label>
-        <input type="text" class="f-input" id="f_outcome" placeholder="例：ACS疑いでPCI、ICU転送">
-      </div>
-      <div class="form-group">
-        <label class="form-label">みんなに聞きたいこと <span class="req">*</span></label>
-        <textarea class="f-textarea" id="f_question" placeholder="この症例で迷ったこと、改善できたこと、アドバイスをもらいたいことを書いてください。"></textarea>
-      </div>
+
+    <!-- プログレスバー -->
+    <div class="step-progress">
+      <div class="step-progress-bar" id="stepProgressBar"></div>
+      <div class="step-indicator" id="stepIndicator">ステップ 1 / 5</div>
     </div>
-    <div class="modal-footer">
-      <button class="submit-btn" id="submitBtn" onclick="submitCase()">投稿する</button>
+
+    <div class="modal-body">
+
+      <!-- ステップ1：症例情報 -->
+      <div class="step-panel active" data-step="1">
+        <div class="step-header">
+          <div class="step-icon">📋</div>
+          <div>
+            <div class="step-title">どんな症例だった？</div>
+            <div class="step-sub">基本情報を入力してください</div>
+          </div>
+        </div>
+
+        <div class="notice"><strong>⚠️ 個人情報の記載は禁止です。</strong><br>氏名・生年月日・日時・病院名など個人が特定できる情報は入力しないでください。</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">年齢層 <span class="req">*</span></label>
+            <select id="f_age" oninput="saveDraft()">
+              <option value="">選択</option><option>10代</option><option>20代</option><option>30代</option><option>40代</option><option>50代</option><option>60代</option><option>70代</option><option>80代以上</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">性別 <span class="req">*</span></label>
+            <select id="f_gender" oninput="saveDraft()">
+              <option value="">選択</option><option>男性</option><option>女性</option><option>不明</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">主訴 <span class="req">*</span></label>
+          <input type="text" class="f-input" id="f_complaint" placeholder="例：胸痛、意識障害、呼吸困難" oninput="saveDraft()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">カテゴリ <span class="req">*</span></label>
+          <div class="chip-group" id="catChips">
+            <label class="chip-label"><input type="checkbox" value="循環器" onchange="saveDraft()"><span>🫀 循環器</span></label>
+            <label class="chip-label"><input type="checkbox" value="脳神経" onchange="saveDraft()"><span>🧠 脳神経</span></label>
+            <label class="chip-label"><input type="checkbox" value="呼吸器" onchange="saveDraft()"><span>🫁 呼吸器</span></label>
+            <label class="chip-label"><input type="checkbox" value="消化器" onchange="saveDraft()"><span>🏥 消化器</span></label>
+            <label class="chip-label"><input type="checkbox" value="外科" onchange="saveDraft()"><span>🔪 外科</span></label>
+            <label class="chip-label"><input type="checkbox" value="小児" onchange="saveDraft()"><span>👶 小児</span></label>
+            <label class="chip-label"><input type="checkbox" value="中毒" onchange="saveDraft()"><span>⚗️ 中毒</span></label>
+            <label class="chip-label"><input type="checkbox" value="外傷" onchange="saveDraft()"><span>🩹 外傷</span></label>
+            <label class="chip-label"><input type="checkbox" value="腎泌尿器" onchange="saveDraft()"><span>💧 腎泌尿器</span></label>
+            <label class="chip-label"><input type="checkbox" value="整形" onchange="saveDraft()"><span>🦴 整形</span></label>
+            <label class="chip-label"><input type="checkbox" value="その他" onchange="saveDraft()"><span>📋 その他</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">バイタル概要 <span class="optional">任意</span></label>
+          <input type="text" class="f-input" id="f_vitals" placeholder="例：BP 80/50, HR 120, SpO2 88%, GCS 10" oninput="saveDraft()">
+        </div>
+      </div>
+
+      <!-- ステップ2：感情 -->
+      <div class="step-panel" data-step="2">
+        <div class="step-header">
+          <div class="step-icon">💭</div>
+          <div>
+            <div class="step-title">そのとき、何を感じた？</div>
+            <div class="step-sub">当てはまるものを選んでください（複数可）</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">感情・印象</label>
+          <div class="chip-group" id="feelingChips">
+            <label class="chip-label"><input type="checkbox" value="焦った" onchange="saveDraft()"><span>😰 焦った</span></label>
+            <label class="chip-label"><input type="checkbox" value="判断に迷った" onchange="saveDraft()"><span>🤔 判断に迷った</span></label>
+            <label class="chip-label"><input type="checkbox" value="怖かった" onchange="saveDraft()"><span>😨 怖かった</span></label>
+            <label class="chip-label"><input type="checkbox" value="自信がなかった" onchange="saveDraft()"><span>😓 自信がなかった</span></label>
+            <label class="chip-label"><input type="checkbox" value="違和感があった" onchange="saveDraft()"><span>🤨 違和感があった</span></label>
+            <label class="chip-label"><input type="checkbox" value="達成感があった" onchange="saveDraft()"><span>😌 達成感があった</span></label>
+            <label class="chip-label"><input type="checkbox" value="モヤモヤした" onchange="saveDraft()"><span>😶‍🌫️ モヤモヤした</span></label>
+            <label class="chip-label"><input type="checkbox" value="悔しかった" onchange="saveDraft()"><span>😣 悔しかった</span></label>
+            <label class="chip-label"><input type="checkbox" value="チームに助けられた" onchange="saveDraft()"><span>🤝 チームに助けられた</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">具体的な気持ち <span class="optional">任意</span></label>
+          <textarea class="f-textarea" id="f_feeling_text" placeholder="例：心電図を見た瞬間、頭が真っ白になった。Drに報告するまでの数分が長く感じた。" oninput="saveDraft()"></textarea>
+        </div>
+      </div>
+
+      <!-- ステップ3：評価 -->
+      <div class="step-panel" data-step="3">
+        <div class="step-header">
+          <div class="step-icon">⚖️</div>
+          <div>
+            <div class="step-title">うまくいったこと・いかなかったこと</div>
+            <div class="step-sub">事実ベースで振り返りましょう</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label good-label">✅ うまくいったこと <span class="optional">任意</span></label>
+          <textarea class="f-textarea" id="f_good" placeholder="例：12誘導をすぐに準備できた。Dr到着までに必要な物品が揃っていた。" oninput="saveDraft()"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label bad-label">⚠️ うまくいかなかったこと <span class="optional">任意</span></label>
+          <textarea class="f-textarea" id="f_bad" placeholder="例：Drへの報告が遅れた。家族説明のタイミングを逃した。" oninput="saveDraft()"></textarea>
+        </div>
+      </div>
+
+      <!-- ステップ4：分析 -->
+      <div class="step-panel" data-step="4">
+        <div class="step-header">
+          <div class="step-icon">🔍</div>
+          <div>
+            <div class="step-title">何が原因だと思う？</div>
+            <div class="step-sub">当てはまるものを選んでください（複数可）</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">原因と考えられること</label>
+          <div class="chip-group" id="causeChips">
+            <label class="chip-label"><input type="checkbox" value="知識不足" onchange="saveDraft()"><span>📚 知識不足</span></label>
+            <label class="chip-label"><input type="checkbox" value="経験不足" onchange="saveDraft()"><span>👶 経験不足</span></label>
+            <label class="chip-label"><input type="checkbox" value="技術不足" onchange="saveDraft()"><span>🔧 技術不足</span></label>
+            <label class="chip-label"><input type="checkbox" value="アセスメント不足" onchange="saveDraft()"><span>🩺 アセスメント不足</span></label>
+            <label class="chip-label"><input type="checkbox" value="チーム連携" onchange="saveDraft()"><span>👥 チーム連携</span></label>
+            <label class="chip-label"><input type="checkbox" value="情報共有不足" onchange="saveDraft()"><span>💬 情報共有不足</span></label>
+            <label class="chip-label"><input type="checkbox" value="物品・環境" onchange="saveDraft()"><span>🏥 物品・環境</span></label>
+            <label class="chip-label"><input type="checkbox" value="時間的余裕" onchange="saveDraft()"><span>⏰ 時間的余裕</span></label>
+            <label class="chip-label"><input type="checkbox" value="精神的負荷" onchange="saveDraft()"><span>💔 精神的負荷</span></label>
+            <label class="chip-label"><input type="checkbox" value="その他要因" onchange="saveDraft()"><span>❓ その他要因</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">最終診断・転帰 <span class="optional">任意</span></label>
+          <input type="text" class="f-input" id="f_outcome" placeholder="例：ACS疑いでPCI、ICU転送" oninput="saveDraft()">
+        </div>
+      </div>
+
+      <!-- ステップ5：質問 -->
+      <div class="step-panel" data-step="5">
+        <div class="step-header">
+          <div class="step-icon">🙋</div>
+          <div>
+            <div class="step-title">みんなに聞きたいこと</div>
+            <div class="step-sub">最後に、相談したいことを書きましょう</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">よくある質問パターン</label>
+          <div class="chip-group" id="qHints">
+            <label class="chip-label"><input type="checkbox" onchange="appendQuestionHint(this)"><span>このタイミングで何をすべき？</span></label>
+            <label class="chip-label"><input type="checkbox" onchange="appendQuestionHint(this)"><span>判断は妥当だった？</span></label>
+            <label class="chip-label"><input type="checkbox" onchange="appendQuestionHint(this)"><span>もっと早く動けたか？</span></label>
+            <label class="chip-label"><input type="checkbox" onchange="appendQuestionHint(this)"><span>みんなならどうした？</span></label>
+            <label class="chip-label"><input type="checkbox" onchange="appendQuestionHint(this)"><span>類似症例の経験は？</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">質問内容 <span class="req">*</span></label>
+          <textarea class="f-textarea" id="f_question" placeholder="例：徐脈＋低血圧の段階で、皆さんはどのタイミングでペーシングの準備を始めますか？" oninput="saveDraft()" style="min-height:140px;"></textarea>
+        </div>
+
+        <div class="summary-box" id="summaryBox"></div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer step-footer">
+      <button class="step-btn step-back" id="stepBack" onclick="prevStep()" style="display:none;">← 戻る</button>
+      <button class="step-btn step-draft" onclick="clearDraft()">下書き削除</button>
+      <button class="step-btn step-next primary" id="stepNext" onclick="nextStep()">次へ →</button>
+      <button class="step-btn step-submit primary" id="stepSubmit" onclick="submitCase()" style="display:none;">投稿する</button>
     </div>
   </div>
 </div>
@@ -347,34 +498,29 @@ mark{background:#fff3c4;color:inherit;border-radius:2px;padding:0 1px;}
 <div class="toast" id="toast"></div>
 
 <script>
-// ==============================
-// ⚙️ Supabase設定 ここだけ書き換えて！
-// ==============================
 const SUPABASE_URL = 'https://vncekznakpnrvmqnexgu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_fbABzcgMWbbF4H6y_SYWwA_kvJifRQ2';
-// ==============================
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CATS=['すべて','循環器','神経','外傷','呼吸器','消化器','小児','中毒','その他'];
-const ICONS={循環器:'🫀',神経:'🧠',外傷:'🩹',呼吸器:'🫁',消化器:'🏥',小児:'👶',中毒:'⚗️',その他:'📋'};
-const COLORS={循環器:'#fdecea',神経:'#e8f0fb',外傷:'#fef3e2',呼吸器:'#e6f7f2',消化器:'#fff3e0',小児:'#f3e8ff',中毒:'#e8f5e9',その他:'#f4f6f9'};
+const CATS=['すべて','循環器','脳神経','呼吸器','消化器','外科','小児','中毒','外傷','腎泌尿器','整形','その他'];
+const ICONS={循環器:'🫀',脳神経:'🧠',呼吸器:'🫁',消化器:'🏥',外科:'🔪',小児:'👶',中毒:'⚗️',外傷:'🩹',腎泌尿器:'💧',整形:'🦴',その他:'📋'};
+const COLORS={循環器:'#fdecea',脳神経:'#e8f0fb',呼吸器:'#e6f7f2',消化器:'#fff3e0',外科:'#fef3e2',小児:'#f3e8ff',中毒:'#e8f5e9',外傷:'#fef3e2',腎泌尿器:'#e8f4fb',整形:'#f5f0e8',その他:'#f4f6f9'};
 const AVATARS=['🧑‍⚕️','👩‍⚕️','👨‍⚕️'];
 
 let allCases=[], allAnswers=[], allReplies=[];
-let currentCat='すべて', currentSort='new', searchQuery='', currentRoute='', showResolved=false;
+let currentCat='すべて', currentSort='new', searchQuery='', showResolved=false;
+let currentCbTab='recruiting'; // 'recruiting' or 'resolved'
 let votedAnswers=new Set(JSON.parse(localStorage.getItem('votedAnswers')||'[]'));
 let reportTargetId=null;
 
-// ── トースト ──
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// ── 時間フォーマット ──
 function fmtTime(ts){
   const m=Math.floor((Date.now()-new Date(ts))/60000);
   if(m<1)return'たった今'; if(m<60)return m+'分前';
@@ -382,10 +528,8 @@ function fmtTime(ts){
   return Math.floor(h/24)+'日前';
 }
 
-// ── ハイライト ──
 const hl=(t,q)=>q?t.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark>${m}</mark>`):t;
 
-// ── データ取得 ──
 async function loadAll(){
   const [casesRes, answersRes, repliesRes] = await Promise.all([
     db.from('cases').select('*').order('created_at',{ascending:false}),
@@ -398,11 +542,19 @@ async function loadAll(){
   render();
 }
 
-// ── フィルタ ──
 function getFiltered(){
   let list=[...allCases];
+
+  // タブによるフィルタ
+  if(currentCbTab==='recruiting'){
+    list=list.filter(c=>!c.resolved&&allAnswers.filter(a=>a.case_id===c.id).length===0);
+  } else if(currentCbTab==='resolved'){
+    list=list.filter(c=>c.resolved);
+    list.sort((a,b)=>new Date(b.updated_at||b.created_at)-new Date(a.updated_at||a.created_at));
+    return list.slice(0,20);
+  }
+
   if(currentCat!=='すべて') list=list.filter(c=>c.categories.includes(currentCat));
-  if(currentRoute) list=list.filter(c=>c.route===currentRoute);
   if(showResolved) list=list.filter(c=>c.resolved);
   if(searchQuery){
     const q=searchQuery.toLowerCase();
@@ -416,20 +568,26 @@ function getFiltered(){
   return list;
 }
 
-// ── レンダリング ──
 function render(){
   const today=new Date().toDateString();
   document.getElementById('statTotal').textContent=allCases.length;
   document.getElementById('statComments').textContent=allAnswers.length;
   document.getElementById('statToday').textContent=allCases.filter(c=>new Date(c.created_at).toDateString()===today).length;
 
-  // カテゴリフィルター
+  // バッジ更新
+  const recruitingCount=allCases.filter(c=>!c.resolved&&allAnswers.filter(a=>a.case_id===c.id).length===0).length;
+  const resolvedCount=allCases.filter(c=>c.resolved).length;
+  document.getElementById('recruitingBadge').textContent=recruitingCount;
+  document.getElementById('resolvedBadge').textContent=resolvedCount;
+
+  // ソートボタン：解決済みタブでは非表示
+  document.getElementById('sortBtns').style.display=currentCbTab==='resolved'?'none':'flex';
+
   document.getElementById('catFilter').innerHTML=CATS.map(cat=>{
     const n=cat==='すべて'?allCases.length:allCases.filter(c=>c.categories.includes(cat)).length;
     return`<button class="cat-btn${cat===currentCat?' active':''}" onclick="setCat('${cat}')">${cat==='すべて'?'📋':ICONS[cat]||'🏥'} ${cat}<span class="cat-count">${n}</span></button>`;
   }).join('');
 
-  // ランキング
   const answerMap={};
   allAnswers.forEach(a=>{
     if(!answerMap[a.name])answerMap[a.name]={name:a.name,role:a.role||'',helpful:0,count:0};
@@ -444,10 +602,15 @@ function render(){
 
   const filtered=getFiltered();
   const q=searchQuery;
-  document.getElementById('resultCount').innerHTML=`<strong>${filtered.length}件</strong>の症例${q?`（"${q}"）`:''}`;
+
+  const tabLabel=currentCbTab==='recruiting'?'回答募集中の症例':'解決済みの症例';
+  document.getElementById('resultCount').innerHTML=`<strong>${filtered.length}件</strong>の${tabLabel}${q?`（"${q}"）`:''}`;
 
   if(!filtered.length){
-    document.getElementById('caseList').innerHTML=`<div class="no-result"><div class="icon">🔍</div><div>該当する症例が見つかりませんでした。</div></div>`;
+    const emptyMsg=currentCbTab==='recruiting'
+      ?'<div class="no-result"><div class="icon">🎉</div><div>回答募集中の症例はありません。<br>みんなの質問に答えてみよう！</div></div>'
+      :'<div class="no-result"><div class="icon">📋</div><div>まだ解決済みの症例がありません。</div></div>';
+    document.getElementById('caseList').innerHTML=emptyMsg;
     return;
   }
 
@@ -457,12 +620,11 @@ function render(){
     const catTags=c.categories.map(cat=>`<span class="tag tag-cat">${cat}</span>`).join('');
     const caseAnswers=allAnswers.filter(a=>a.case_id===c.id);
     const totalHelpful=caseAnswers.reduce((s,a)=>s+a.helpful,0);
+    const isRecruiting=!c.resolved&&caseAnswers.length===0;
 
-    // 関連症例
     const related=allCases.filter(x=>x.id!==c.id&&x.categories.some(cat=>c.categories.includes(cat))).slice(0,3);
     const relatedHtml=related.length?`<div class="related-section"><div class="related-title">🔗 関連症例</div>${related.map(r=>`<div class="related-item" onclick="scrollToCase('${r.id}')"><span class="related-icon">${ICONS[r.categories[0]]||'📋'}</span><span class="related-text">${r.complaint}</span><span class="related-ans">💬${allAnswers.filter(a=>a.case_id===r.id).length}</span></div>`).join('')}</div>`:'';
 
-    // ベスト回答
     const bestAnswer=caseAnswers.length?caseAnswers.reduce((best,x)=>x.helpful>best.helpful?x:best,caseAnswers[0]):null;
 
     const answersHtml=caseAnswers.map(a=>{
@@ -501,7 +663,7 @@ function render(){
         <div class="q-body">
           <div class="q-title">${hl(c.complaint,q)}</div>
           <div class="q-excerpt">${hl(c.question,q)}</div>
-          <div class="q-tags">${catTags}<span class="tag tag-route">${c.route}</span><span class="tag tag-patient">${c.age}・${c.gender}</span>${c.resolved?'<span class="tag tag-resolved">✓ 解決済み</span>':''}</div>
+          <div class="q-tags">${catTags}<span class="tag tag-patient">${c.age}・${c.gender}</span>${c.resolved?'<span class="tag tag-resolved">✓ 解決済み</span>':''}${isRecruiting?'<span class="tag tag-募集中">💬 回答募集中</span>':''}</div>
           <div class="q-meta"><span>💬 ${caseAnswers.length}件の回答</span><span>👍 ${totalHelpful}</span><span>🕐 ${fmtTime(c.created_at)}</span></div>
         </div>
       </div>
@@ -531,12 +693,18 @@ function render(){
   }).join('');
 }
 
+function setCbTab(tab, btn){
+  currentCbTab=tab;
+  document.querySelectorAll('.cb-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
 function toggleDetail(id){document.getElementById(`detail-${id}`).classList.toggle('open');}
 function scrollToCase(id){const el=document.getElementById(`qitem-${id}`);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>document.getElementById(`detail-${id}`).classList.add('open'),400);}}
 function setCat(cat){currentCat=cat;render();}
 function setSort(s,btn){currentSort=s;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function doSearch(){searchQuery=document.getElementById('searchInput').value.trim();render();}
-function setRoute(btn,route){currentRoute=route;document.querySelectorAll('.filter-chip').forEach(b=>{if(b.onclick&&b.onclick.toString().includes('setRoute'))b.classList.remove('active')});btn.classList.add('active');render();}
 function toggleResolved(btn){showResolved=!showResolved;btn.classList.toggle('active',showResolved);render();}
 function toggleReplyInput(caseId,ansId){document.getElementById(`replyWrap-${caseId}-${ansId}`).classList.toggle('open');}
 
@@ -582,7 +750,12 @@ async function sendReply(caseId,answerId){
   showToast('✅ 返信しました');
 }
 
-function openModal(){document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function openModal(){
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadDraft();
+  showStep(1);
+}
 function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
 function handleOverlay(e){if(e.target===document.getElementById('overlay'))closeModal();}
 function openReport(caseId){reportTargetId=caseId;document.getElementById('reportOverlay').classList.add('open');}
@@ -595,30 +768,142 @@ function submitReport(){
   document.querySelectorAll('input[name="reportReason"]').forEach(r=>r.checked=false);
 }
 
+// ── ステップ管理 ──
+let currentStep=1;
+const TOTAL_STEPS=5;
+
+function showStep(n){
+  currentStep=n;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.toggle('active',+p.dataset.step===n));
+  document.getElementById('stepProgressBar').style.width=(n/TOTAL_STEPS*100)+'%';
+  document.getElementById('stepIndicator').textContent=`ステップ ${n} / ${TOTAL_STEPS}`;
+  document.getElementById('stepBack').style.display=n>1?'inline-block':'none';
+  document.getElementById('stepNext').style.display=n<TOTAL_STEPS?'inline-block':'none';
+  document.getElementById('stepSubmit').style.display=n===TOTAL_STEPS?'inline-block':'none';
+  if(n===TOTAL_STEPS) renderSummary();
+}
+
+function nextStep(){
+  if(currentStep===1){
+    const age=document.getElementById('f_age').value;
+    const gender=document.getElementById('f_gender').value;
+    const complaint=document.getElementById('f_complaint').value.trim();
+    const cats=document.querySelectorAll('#catChips input:checked').length;
+    if(!age||!gender||!complaint||!cats){showToast('ステップ1の必須項目をすべて入力してください');return;}
+  }
+  if(currentStep<TOTAL_STEPS) showStep(currentStep+1);
+}
+
+function prevStep(){if(currentStep>1) showStep(currentStep-1);}
+
+function appendQuestionHint(cb){
+  if(!cb.checked) return;
+  const ta=document.getElementById('f_question');
+  const hint=cb.parentElement.querySelector('span').textContent;
+  ta.value=(ta.value?ta.value+'\n':'')+hint+' ';
+  ta.focus();
+  cb.checked=false;
+  saveDraft();
+}
+
+function renderSummary(){
+  const v=id=>document.getElementById(id)?.value||'';
+  const checks=sel=>Array.from(document.querySelectorAll(sel+' input:checked')).map(i=>i.value);
+  const age=v('f_age'),gender=v('f_gender'),complaint=v('f_complaint');
+  const cats=checks('#catChips').join('・');
+  const feelings=checks('#feelingChips').join('・');
+  const causes=checks('#causeChips').join('・');
+  document.getElementById('summaryBox').innerHTML=`
+    <div class="sb-title">📋 入力内容のサマリー</div>
+    <div class="sb-row"><b>症例：</b>${age||'-'}・${gender||'-'} / ${complaint||'-'}</div>
+    <div class="sb-row"><b>カテゴリ：</b>${cats||'-'}</div>
+    ${feelings?`<div class="sb-row"><b>感情：</b>${feelings}</div>`:''}
+    ${causes?`<div class="sb-row"><b>原因：</b>${causes}</div>`:''}
+  `;
+}
+
+// ── 下書き保存 ──
+const DRAFT_KEY='er-debrief-draft';
+function saveDraft(){
+  const v=id=>document.getElementById(id)?.value||'';
+  const checks=sel=>Array.from(document.querySelectorAll(sel+' input:checked')).map(i=>i.value);
+  const draft={
+    age:v('f_age'),gender:v('f_gender'),complaint:v('f_complaint'),
+    cats:checks('#catChips'),vitals:v('f_vitals'),
+    feelings:checks('#feelingChips'),feelingText:v('f_feeling_text'),
+    good:v('f_good'),bad:v('f_bad'),
+    causes:checks('#causeChips'),outcome:v('f_outcome'),question:v('f_question')
+  };
+  localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));
+}
+
+function loadDraft(){
+  const raw=localStorage.getItem(DRAFT_KEY);
+  if(!raw) return;
+  try{
+    const d=JSON.parse(raw);
+    const set=(id,val)=>{const el=document.getElementById(id);if(el&&val) el.value=val;};
+    set('f_age',d.age);set('f_gender',d.gender);set('f_complaint',d.complaint);
+    set('f_vitals',d.vitals);set('f_feeling_text',d.feelingText);
+    set('f_good',d.good);set('f_bad',d.bad);set('f_outcome',d.outcome);set('f_question',d.question);
+    const checkBy=(sel,arr)=>{if(!arr) return;document.querySelectorAll(sel+' input').forEach(i=>{i.checked=arr.includes(i.value);});};
+    checkBy('#catChips',d.cats);checkBy('#feelingChips',d.feelings);checkBy('#causeChips',d.causes);
+    if(d.complaint||d.question) showToast('💾 下書きを復元しました');
+  }catch(e){}
+}
+
+function clearDraft(){
+  if(!confirm('入力内容を削除しますか？')) return;
+  localStorage.removeItem(DRAFT_KEY);
+  ['f_age','f_gender','f_complaint','f_vitals','f_feeling_text','f_good','f_bad','f_outcome','f_question'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.modal .chip-group input').forEach(i=>i.checked=false);
+  showStep(1);
+  showToast('下書きを削除しました');
+}
+
 async function submitCase(){
   const v=id=>document.getElementById(id)?.value||'';
-  const age=v('f_age'),gender=v('f_gender'),route=v('f_route'),complaint=v('f_complaint').trim();
-  const cats=Array.from(document.querySelectorAll('.chip-group input:checked')).map(i=>i.value);
-  const vitals=v('f_vitals').trim(),assessment=v('f_assess').trim(),outcome=v('f_outcome').trim(),question=v('f_question').trim();
-  if(!age||!gender||!route||!complaint||!cats.length||!assessment||!question){showToast('必須項目（*）をすべて入力してください');return;}
+  const checks=sel=>Array.from(document.querySelectorAll(sel+' input:checked')).map(i=>i.value);
+  const age=v('f_age'),gender=v('f_gender'),complaint=v('f_complaint').trim();
+  const cats=checks('#catChips');
+  const vitals=v('f_vitals').trim();
+  const feelings=checks('#feelingChips');
+  const feelingText=v('f_feeling_text').trim();
+  const good=v('f_good').trim();
+  const bad=v('f_bad').trim();
+  const causes=checks('#causeChips');
+  const outcome=v('f_outcome').trim();
+  const question=v('f_question').trim();
 
-  const btn=document.getElementById('submitBtn');
+  if(!age||!gender||!complaint||!cats.length||!question){
+    showToast('必須項目（*）をすべて入力してください');
+    return;
+  }
+
+  // 既存DBスキーマに合わせて assessment フィールドにまとめる
+  const assessmentParts=[];
+  if(feelings.length) assessmentParts.push('【感情・印象】\n'+feelings.join('・'));
+  if(feelingText) assessmentParts.push(feelingText);
+  if(good) assessmentParts.push('【うまくいったこと】\n'+good);
+  if(bad) assessmentParts.push('【うまくいかなかったこと】\n'+bad);
+  if(causes.length) assessmentParts.push('【原因と考えられること】\n'+causes.join('・'));
+  const assessment=assessmentParts.join('\n\n')||'（記載なし）';
+
+  const btn=document.getElementById('stepSubmit');
   btn.disabled=true;btn.textContent='投稿中…';
-
-  const {error}=await db.from('cases').insert({age,gender,route,complaint,categories:cats,vitals,assessment,outcome,question,resolved:false,helpful_count:0});
-
+  const {error}=await db.from('cases').insert({age,gender,complaint,categories:cats,vitals,assessment,outcome,question,resolved:false,helpful_count:0});
   btn.disabled=false;btn.textContent='投稿する';
-
   if(error){showToast('エラーが発生しました。もう一度試してください。');return;}
 
   closeModal();
-  ['f_age','f_gender','f_route','f_complaint','f_vitals','f_assess','f_outcome','f_question'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.querySelectorAll('.chip-group input').forEach(i=>i.checked=false);
+  localStorage.removeItem(DRAFT_KEY);
+  ['f_age','f_gender','f_complaint','f_vitals','f_feeling_text','f_good','f_bad','f_outcome','f_question'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.modal .chip-group input').forEach(i=>i.checked=false);
+  showStep(1);
   await loadAll();
   showToast('✅ 症例を投稿しました！');
 }
 
-// 初期読み込み
 loadAll();
 </script>
 </body>
